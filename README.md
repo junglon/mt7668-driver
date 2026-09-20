@@ -79,7 +79,7 @@ echo wlan_mt7668 | sudo tee /etc/modules-load.d/wlan_mt7668.conf
 ## Device Tree (DTS) Reference
 
 Included in `dts/meson-g12a-b860h-v5.dts` is the updated Device Tree source for ZTE B860H V5:
-- `pwm@19000` (`status = okay`) providing `wifi32k` (32.768 kHz clock).
+- `pwm@19000` (`status = "okay"`) providing `wifi32k` (32.768 kHz clock).
 - `sdio-pwrseq` on `GPIOX_6` with 200ms power-off delay and 500ms post-power-on delay.
 - `meson-ir` NEC remote receiver on `GPIOAO_5`.
 
@@ -88,4 +88,8 @@ Included in `dts/meson-g12a-b860h-v5.dts` is the updated Device Tree source for 
 ## License
 GPL-2.0 / MediaTek Proprietary Driver Base.
 
-##Build with AntiGravity
+---
+
+## Credits
+
+*Built with Antigravity using Gemini 3.6 Flash :)*
