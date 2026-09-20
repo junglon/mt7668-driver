@@ -1,3 +1,4 @@
+CONFIG_MT7668 ?= m
 # SPDX-License-Identifier: GPL-2.0-only
 #
 # MediaTek MT7668 (SDIO) proprietary fullmac WiFi driver

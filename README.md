@@ -1,72 +1,19 @@
 # MediaTek MT7668 SDIO Wi-Fi Driver for Linux 6.18+ (Amlogic G12A / Armbian)
 
-Patched out-of-tree Linux kernel driver for the **MediaTek MT7668** SDIO 802.11ac Wi-Fi / Bluetooth combo module, specifically modified for modern Linux kernels (Linux 6.18+) and Amlogic G12A (S905X2) TV boxes such as **ZTE B860H V5**.
+Patched out-of-tree Linux kernel driver for the **MediaTek MT7668** SDIO 802.11ac Wi-Fi combo module, updated for modern Linux kernels (Linux 6.18+) and Amlogic TV boxes.
 
 ---
 
-## Key Patches & Fixes Applied
+## 🚀 Verified Proof of Operation (ZTE B860H V5)
 
-### 1. Fix Level 1 Translation Fault Kernel Panic (`gl_os.h`)
-- **Problem**: Indexing `ai4TxPendingFrameNumPerQueue[HW_BSSID_NUM]` and `arNetInterfaceInfo[HW_BSSID_NUM]` caused array out-of-bounds memory corruption when `HW_BSSID_NUM = 4`, leading to paging request panics on Linux 6.18+.
-- **Fix**: Expanded array bounds to `HW_BSSID_NUM + 1`:
-  ```c
-  INT_32 ai4TxPendingFrameNumPerQueue[HW_BSSID_NUM + 1][CFG_MAX_TXQ_NUM];
-  NET_INTERFACE_INFO_T arNetInterfaceInfo[HW_BSSID_NUM + 1];
-  ```
-
-### 2. Amlogic G12A Bounce Buffer FIFO Overflow Clamping (`config.h` & `gl_init.c`)
-- **Problem**: Amlogic G12A `meson-gx-mmc` controller fails single SDIO DMA transfers larger than ~1.5KB, triggering hardware TX FIFO overflows (`WASR = 0x00000002`).
-- **Fix**: Clamped maximum TX packet size and image block size to 1408 bytes:
-  - `CFG_TX_MAX_PKT_SIZE = 1408`
-  - `CMD_PKT_SIZE_FOR_IMAGE = 1408`
-  - Set interface default MTU = 1408 bytes in `gl_init.c`: `prGlueInfo->prDevHandler->mtu = 1408;`
-
-### 3. RX Enhancement & Handshake Timeout (`config.h`)
-- **Problem**: `WHCR_RX_ENHANCE_MODE_EN` suppressed frame length reporting in `MCR_WRPLR`, causing polling timeouts (`halRxWaitResponse`) during firmware handshakes.
-- **Fix**: Disabled `CFG_SDIO_RX_ENHANCE` and `CFG_SDIO_TX_AGG`.
-
----
-
-## Build & Installation Instructions
-
-### Prerequisites
-Make sure kernel headers and build utilities are installed:
-```bash
-sudo apt update
-sudo apt install build-essential linux-headers-$(uname -r) git
-```
-
-### 1. Building and Installing the Module
-```bash
-# Clone repository
-git clone https://github.com/junglon/mt7668-driver.git
-cd mt7668-driver
-
-# Build kernel module
-make
-
-# Install module into kernel drivers directory
-sudo make install
-sudo depmod -a
-```
-
-### 2. Loading the Driver
-```bash
-sudo modprobe wlan_mt7668
-```
-
-To auto-load on system boot:
-```bash
-echo wlan_mt7668 | sudo tee /etc/modules-load.d/wlan_mt7668.conf
-```
-
----
-
-## Verified Performance (ZTE B860H V5 / Linux 6.18.48-ophub)
-
-- **Upload Speed**: **94.6 Mbps**
-- **Download Speed**: **64.2 Mbps**
-- **Latency**: **1.06 ms - 1.51 ms**
+This driver is tested and verified on **ZTE B860H V5** running **Armbian Linux 6.18.48-ophub**:
+- **Clean dmesg**: Zero `[wlan]` trace log spam (`DBG_DISABLE_ALL_LOG 1`).
+- **Power Stability**: Low-power auto-sleep disabled (`CFG_ENABLE_FULL_PM 0`) to prevent SDIO card removal timeouts (`error -110`).
+- **DKMS Support**: Automatically compiles and updates across kernel upgrades via DKMS.
+- **Verified Performance**:
+  - **Upload**: **94.6 Mbps**
+  - **Download**: **64.2 Mbps**
+  - **Latency**: **1.06 ms - 1.51 ms**
 
 ```text
 [ ID] Interval           Transfer     Bitrate         Retr
@@ -76,20 +23,42 @@ echo wlan_mt7668 | sudo tee /etc/modules-load.d/wlan_mt7668.conf
 
 ---
 
-## Device Tree (DTS) Reference
+## 📦 Installation Methods
 
-Included in `dts/meson-g12a-b860h-v5.dts` is the updated Device Tree source for ZTE B860H V5:
-- `pwm@19000` (`status = "okay"`) providing `wifi32k` (32.768 kHz clock).
-- `sdio-pwrseq` on `GPIOX_6` with 200ms power-off delay and 500ms post-power-on delay.
-- `meson-ir` NEC remote receiver on `GPIOAO_5`.
+### Option A: Install via Debian Package (.deb)
+Download `mt7668-dkms_1.0.0_all.deb` from [Releases](https://github.com/junglon/mt7668-driver/releases) and run:
+```bash
+sudo dpkg -i mt7668-dkms_1.0.0_all.deb
+```
+
+### Option B: Build & Install Debian Package from Source
+```bash
+git clone https://github.com/junglon/mt7668-driver.git
+cd mt7668-driver
+chmod +x build-deb.sh
+./build-deb.sh
+sudo dpkg -i mt7668-dkms_1.0.0_all.deb
+```
 
 ---
 
-## License
-GPL-2.0 / MediaTek Proprietary Driver Base.
+## 🛠 Key Patches & Fixes Applied
+
+1. **Level 1 Translation Fault Fix (`gl_os.h`)**: Expanded `ai4TxPendingFrameNumPerQueue` and `arNetInterfaceInfo` bounds to `HW_BSSID_NUM + 1` to resolve 6.18+ kernel paging panics.
+2. **Amlogic G12A Bounce Buffer Clamping (`config.h` & `gl_init.c`)**: Clamped `CFG_TX_MAX_PKT_SIZE` and MTU to 1408 bytes to avoid SDIO DMA FIFO overflows.
+3. **Log Spam Suppression (`debug.h`)**: Set `DBG_DISABLE_ALL_LOG 1` to ensure clean kernel logs without flooding `dmesg`.
+4. **Power Management Stability (`config.h`)**: Set `CFG_ENABLE_FULL_PM 0` to maintain active SDIO clock synchronization.
+5. **DKMS Integration (`dkms.conf` & `Makefile`)**: Added `CONFIG_MT7668 ?= m` for clean out-of-tree DKMS package generation.
 
 ---
 
-## Credits
+## 📜 License
+GPL-2.0 / MediaTek Proprietary Base.
 
-*Built with Antigravity using Gemini 3.6 Flash :)*
+---
+
+## 🤝 Credits & References
+
+- **MediaTek Inc.**: Original MT6632/MT7668 combo driver codebase.
+- **Armbian & Ophub**: Kernel headers, build environment, and Amlogic G12A kernel support (`Linux 6.18.48-ophub`).
+- **Antigravity**: Built with Google Antigravity using Gemini Flash 3.6 ⚡

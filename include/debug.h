@@ -67,7 +67,7 @@
 #define BUILD_QA_DBG 0
 #endif
 
-#define DBG_DISABLE_ALL_LOG             0
+#define DBG_DISABLE_ALL_LOG             1
 
 #include "gl_typedef.h"
 
@@ -185,9 +185,10 @@ typedef enum _ENUM_DBG_ASSERT_PATH_T {
 *#endif
 */
 #if DBG_DISABLE_ALL_LOG
-#define DBGLOG(_Module, _Class, _Fmt)
-#define DBGLOG_MEM8(_Module, _Class, _StartAddr, _Length)
-#define DBGLOG_MEM32(_Module, _Class, _StartAddr, _Length)
+#define DBGLOG(_Module, _Class, _Fmt, ...) do { } while (0)
+#define TOOL_PRINTLOG(_Module, _Class, _Fmt, ...) do { } while (0)
+#define DBGLOG_MEM8(_Module, _Class, _StartAddr, _Length) do { } while (0)
+#define DBGLOG_MEM32(_Module, _Class, _StartAddr, _Length) do { } while (0)
 #else
 #define DBGLOG(_Module, _Class, _Fmt, ...) \
 	do { \
