@@ -135,13 +135,6 @@ halRxWaitResponse(IN P_ADAPTER_T prAdapter, IN UINT_8 ucPortIdx, OUT PUINT_8 puc
 	prRxCtrl = &prAdapter->rRxCtrl;
 
 	u4Time = (UINT_32) kalGetTimeTick();
-	{
-		UINT_32 d0 = 0, d1 = 0, d2 = 0;
-		HAL_MCR_RD(prAdapter, MCR_WRPLR, &d0);
-		HAL_MCR_RD(prAdapter, MCR_WHCR, &d1);
-		HAL_MCR_RD(prAdapter, MCR_WHISR, &d2);
-		printk(KERN_ERR "[wlan] halRxWaitResponse: enter WRPLR=0x%08x WHCR=0x%08x WHISR=0x%08x\n", d0, d1, d2);
-	}
 
 	do {
 		/* Read the packet length */
