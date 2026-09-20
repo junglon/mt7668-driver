@@ -1,6 +1,6 @@
-# MediaTek MT7668 SDIO Wi-Fi Driver for Linux 6.18+ (Amlogic G12A / Armbian)
+# MediaTek MT7668 SDIO Wi-Fi Driver for Linux 6.x (6.12 LTS, 6.18+) (Amlogic G12A / Armbian)
 
-Patched out-of-tree Linux kernel driver for the **MediaTek MT7668** SDIO 802.11ac Wi-Fi combo module, updated for modern Linux kernels (Linux 6.18+) and Amlogic TV boxes.
+Patched out-of-tree Linux kernel driver for the **MediaTek MT7668** SDIO 802.11ac Wi-Fi combo module, updated for modern Linux kernels (Linux 6.12 LTS, 6.18+) on Debian Bookworm and Ubuntu Noble and Amlogic TV boxes.
 
 ---
 
@@ -26,9 +26,9 @@ This driver is tested and verified on **ZTE B860H V5** running **Armbian Linux 6
 ## 📦 Installation Methods
 
 ### Option A: Install via Debian Package (.deb)
-Download `mt7668-dkms_1.0.0_all.deb` from [Releases](https://github.com/junglon/mt7668-driver/releases) and run:
+Download `mt7668-dkms_1.0.1_all.deb` from [Releases](https://github.com/junglon/mt7668-driver/releases) and run:
 ```bash
-sudo dpkg -i mt7668-dkms_1.0.0_all.deb
+sudo dpkg -i mt7668-dkms_1.0.1_all.deb
 ```
 
 ### Option B: Build & Install Debian Package from Source
@@ -37,7 +37,7 @@ git clone https://github.com/junglon/mt7668-driver.git
 cd mt7668-driver
 chmod +x build-deb.sh
 ./build-deb.sh
-sudo dpkg -i mt7668-dkms_1.0.0_all.deb
+sudo dpkg -i mt7668-dkms_1.0.1_all.deb
 ```
 
 ---

@@ -1,4 +1,9 @@
 CONFIG_MT7668 ?= m
+
+# Filter out compiler options that may be present in kernel headers built by newer GCC
+# versions (e.g. GCC 14/15 in cross-compilation environments) but not supported by the
+# host compiler (e.g. GCC 12 on Debian Bookworm or GCC 13 on Ubuntu Noble).
+KBUILD_CFLAGS := $(filter-out -fmin-function-alignment=%, $(KBUILD_CFLAGS))
 # SPDX-License-Identifier: GPL-2.0-only
 #
 # MediaTek MT7668 (SDIO) proprietary fullmac WiFi driver
