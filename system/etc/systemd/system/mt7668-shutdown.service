@@ -1,0 +1,15 @@
+[Unit]
+Description=Unbind SDIO controller before shutdown/reboot for clean MT7668 reset
+DefaultDependencies=no
+Before=shutdown.target reboot.target halt.target
+
+[Service]
+Type=oneshot
+# On Amlogic TV boxes (ZTE B860H V5), the MT7668 module is powered by always-on rails.
+# When a software reboot occurs, the SoC resets while MT7668 stays energized.
+# Unbinding the SDIO controller (ffe03000.sd) cleanly disconnects the SDIO bus before reboot,
+# preventing the MT7668 state machine from locking up on warm boot (error -110).
+ExecStart=/bin/sh -c 'if [ -d /sys/bus/platform/drivers/meson-gx-mmc/ffe03000.sd ]; then echo ffe03000.sd > /sys/bus/platform/drivers/meson-gx-mmc/unbind 2>/dev/null || true; fi'
+
+[Install]
+WantedBy=shutdown.target reboot.target halt.target

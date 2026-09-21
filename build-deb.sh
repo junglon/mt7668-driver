@@ -2,7 +2,7 @@
 set -e
 
 PACKAGE=mt7668-dkms
-VERSION=1.0.1
+VERSION=1.0.2
 BUILD_DIR=/tmp/${PACKAGE}_build
 SRC_DIR=${BUILD_DIR}/usr/src/mt7668-${VERSION}
 
@@ -11,8 +11,15 @@ echo "Building Debian package for ${PACKAGE}_${VERSION}..."
 rm -rf ${BUILD_DIR}
 mkdir -p ${SRC_DIR}
 mkdir -p ${BUILD_DIR}/DEBIAN
+mkdir -p ${BUILD_DIR}/etc/modprobe.d
+mkdir -p ${BUILD_DIR}/etc/systemd/system
 
+# Copy source tree to /usr/src/mt7668-${VERSION} for DKMS
 rsync -a --exclude=".git" --exclude="*.o" --exclude="*.ko" --exclude="*.mod" --exclude="*.mod.c" --exclude="*.cmd" --exclude="*.deb" ./ ${SRC_DIR}/
+
+# Copy system configurations and service files into the debian package root
+cp system/etc/modprobe.d/blacklist-mt7668-bluetooth.conf ${BUILD_DIR}/etc/modprobe.d/
+cp system/etc/systemd/system/mt7668-shutdown.service ${BUILD_DIR}/etc/systemd/system/
 
 cat << CTRL > ${BUILD_DIR}/DEBIAN/control
 Package: ${PACKAGE}
@@ -25,6 +32,7 @@ Priority: optional
 Description: MediaTek MT7668 SDIO Wi-Fi driver module (DKMS)
  Patched out-of-tree Linux kernel driver for MediaTek MT7668 SDIO Wi-Fi,
  modified for Linux 6.12+, 6.18+ and Amlogic TV boxes (e.g. ZTE B860H V5).
+ Includes Bluetooth blacklist and SDIO shutdown service for reliable warm reboots.
 CTRL
 
 cat << POST > ${BUILD_DIR}/DEBIAN/postinst
@@ -41,6 +49,15 @@ echo "Configuring automatic kernel module loading..."
 echo wlan_mt7668 > /etc/modules-load.d/wlan_mt7668.conf
 depmod -a
 modprobe wlan_mt7668 2>/dev/null || true
+
+# Unload non-functional upstream Bluetooth module if currently loaded
+modprobe -r btmtksdio btmtk 2>/dev/null || true
+
+# Enable SDIO unbind service on shutdown/reboot to guarantee clean MT7668 hardware reset
+if [ -d /run/systemd/system ]; then
+    systemctl daemon-reload 2>/dev/null || true
+    systemctl enable mt7668-shutdown.service 2>/dev/null || true
+fi
 POST
 chmod 755 ${BUILD_DIR}/DEBIAN/postinst
 
@@ -52,6 +69,11 @@ echo "Removing mt7668 (${VERSION}) from DKMS..."
 modprobe -r wlan_mt7668 2>/dev/null || true
 dkms remove -m mt7668 -v ${VERSION} --all 2>/dev/null || true
 rm -f /etc/modules-load.d/wlan_mt7668.conf
+
+if [ -d /run/systemd/system ]; then
+    systemctl disable mt7668-shutdown.service 2>/dev/null || true
+    systemctl daemon-reload 2>/dev/null || true
+fi
 PRE
 chmod 755 ${BUILD_DIR}/DEBIAN/prerm
 
