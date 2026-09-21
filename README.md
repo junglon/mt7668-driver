@@ -12,10 +12,7 @@ This driver is tested and verified on **ZTE B860H V5 (Amlogic G12A / S905X2)** r
 - **Power Stability**: Low-power auto-sleep disabled (`CFG_ENABLE_FULL_PM 0`) to maintain SDIO clock synchronization.
 - **DKMS Support**: Automatically compiles and updates across kernel upgrades via DKMS.
 - **Universal Compiler Compatibility**: Works cleanly with GCC 12, 13, 14, and 15 without kernel header mismatch errors (`CONFIG_CC_HAS_MIN_FUNCTION_ALIGNMENT=`).
-- **Verified Throughput (iperf3 to local gigabit server)**:
-  - **5 GHz Band (Channel 157, 405-780 Mbps link rate)**:
-    - **Upload (TX)**: **94.2 Mbps** (0 retransmits)
-    - **Download (RX)**: **50.2 Mbps**
+- **Verified Throughput (iperf3 to local server)**:
   - **2.4 GHz Band (Channel 6)**:
     - **Upload (TX)**: **81.2 Mbps** (0 retransmits)
     - **Download (RX)**: **26.9 Mbps**
@@ -38,6 +35,7 @@ sudo apt update
 sudo apt install -y dkms build-essential linux-headers-$(uname -r) wget
 wget https://github.com/junglon/mt7668-driver/releases/download/v1.0.2/mt7668-dkms_1.0.2_all.deb
 sudo dpkg -i mt7668-dkms_1.0.2_all.deb
+sudo reboot
 ```
 
 ### Option B: Build & Install Debian Package from Source
@@ -47,6 +45,7 @@ cd mt7668-driver
 chmod +x build-deb.sh
 ./build-deb.sh
 sudo dpkg -i mt7668-dkms_1.0.2_all.deb
+sudo reboot
 ```
 
 ---
