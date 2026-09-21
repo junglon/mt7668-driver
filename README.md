@@ -13,6 +13,9 @@ This driver is tested and verified on **ZTE B860H V5 (Amlogic G12A / S905X2)** r
 - **DKMS Support**: Automatically compiles and updates across kernel upgrades via DKMS.
 - **Universal Compiler Compatibility**: Works cleanly with GCC 12, 13, 14, and 15 without kernel header mismatch errors (`CONFIG_CC_HAS_MIN_FUNCTION_ALIGNMENT=`).
 - **Verified Throughput (iperf3 to local server)**:
+  - **5 GHz Band (Channel 157, 405-780 Mbps link rate)**:
+    - **Upload (TX)**: **94.2 Mbps** (0 retransmits)
+    - **Download (RX)**: **50.2 Mbps**
   - **2.4 GHz Band (Channel 6)**:
     - **Upload (TX)**: **81.2 Mbps** (0 retransmits)
     - **Download (RX)**: **26.9 Mbps**
