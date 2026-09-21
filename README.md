@@ -36,8 +36,8 @@ The `.deb` package installs the driver module via DKMS and automatically configu
 ```bash
 sudo apt update
 sudo apt install -y dkms build-essential linux-headers-$(uname -r) wget
-wget https://github.com/junglon/mt7668-driver/releases/download/v1.0.2/mt7668-dkms_1.0.2_all.deb
-sudo dpkg -i mt7668-dkms_1.0.2_all.deb
+wget https://github.com/junglon/mt7668-driver/releases/download/v1.0.3/mt7668-dkms_1.0.3_all.deb
+sudo dpkg -i mt7668-dkms_1.0.3_all.deb
 sudo reboot
 ```
 
@@ -47,7 +47,7 @@ git clone https://github.com/junglon/mt7668-driver.git
 cd mt7668-driver
 chmod +x build-deb.sh
 ./build-deb.sh
-sudo dpkg -i mt7668-dkms_1.0.2_all.deb
+sudo dpkg -i mt7668-dkms_1.0.3_all.deb
 sudo reboot
 ```
 

@@ -438,9 +438,8 @@ mtk_cfg80211_set_default_key(struct wiphy *wiphy, struct net_device *ndev, int l
  */
 /*----------------------------------------------------------------------------*/
 #if KERNEL_VERSION(3, 16, 0) <= CFG80211_VERSION_CODE
-int mtk_cfg80211_get_station(struct wiphy *wiphy, struct wireless_dev *wdev, const u8 *mac, struct station_info *sinfo)
+int mtk_cfg80211_get_station(struct wiphy *wiphy, struct net_device *ndev, const u8 *mac, struct station_info *sinfo)
 {
-	struct net_device *ndev = wdev->netdev;
 	P_GLUE_INFO_T prGlueInfo = NULL;
 	WLAN_STATUS rStatus;
 	PARAM_MAC_ADDRESS arBssid;
@@ -519,7 +518,10 @@ int mtk_cfg80211_get_station(struct wiphy *wiphy, struct wireless_dev *wdev, con
 	}
 
 	/* Get statistics from net_dev */
-	prDevStats = (struct net_device_stats *)kalGetStats(ndev);
+	if (ndev)
+		prDevStats = (struct net_device_stats *)kalGetStats(ndev);
+	else
+		prDevStats = NULL;
 
 	if (prDevStats) {
 		/* 4. fill RX_PACKETS */
